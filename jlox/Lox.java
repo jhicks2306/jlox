@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Lox {
+    static boolean hadError = false;
     // Lox entry point. Either run a file or an interactive prompt.
     public static void main(String[] args) throws IOException {
         if (args.length > 1) {
@@ -25,6 +26,9 @@ public class Lox {
     private static void runFile(String path) throws IOException {
         byte[] bytes = Files.readAllBytes(Paths.get(path));
         run(new String(bytes, Charset.defaultCharset()));
+
+        // Indicate an error in the exit code.
+        if (hadError) System.exit(65);
     }
 
     private static void runPrompt() throws IOException {
@@ -35,7 +39,8 @@ public class Lox {
             System.out.print("> ");
             String line = reader.readLine();
             if (line == null) break;
-            run(line); 
+            run(line);
+            hadError = false;
         }
     }
 
@@ -62,3 +67,4 @@ public class Lox {
     }
 }
 
+ 
