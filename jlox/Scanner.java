@@ -48,4 +48,19 @@ class Scanner {
     private boolean isAtEnd() {
         return current >= source.length();
     }
+
+    private char advance() {
+        return source.charAt(current++);
+    }
+
+    // overload method for tokens without literals.
+    private void addToken(TokenType type) {
+        addToken(type, null);
+    }
+
+    // main add token method.
+    private void addToken(TokenType type, Object literal) {
+        String text = source.substring(start, current);
+        tokens.add(new Token(type, text, literal, line));
+    }
 }
