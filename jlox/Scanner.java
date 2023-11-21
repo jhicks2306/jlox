@@ -18,7 +18,7 @@ class Scanner {
         this.source = source;
     }
 
-    List<Token> scaTokens() {
+    List<Token> scanTokens() {
         while (!isAtEnd()) {
             // We are at the beginning of the next lexeme
             start = current;
@@ -27,5 +27,9 @@ class Scanner {
 
         tokens.add(new Token(EOF,"",null, line));
         return tokens;
+    }
+
+    private boolean isAtEnd() {
+        return current >= source.length();
     }
 }
