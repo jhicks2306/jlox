@@ -10,7 +10,7 @@ enum TokenType {
     GREATER, GREATER_EQUAL, LESS, LESS_EQUAL,
 
     // Literals.
-    INDENTIFIER, STRING, NUMBER,
+    IDENTIFIER, STRING, NUMBER,
 
     // Keywords.
     AND, CLASS, ELSE, FALSE, FUN, FOR, IF, NIL, OR,
