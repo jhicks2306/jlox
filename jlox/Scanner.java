@@ -55,6 +55,7 @@ class Scanner {
             case '>':
                 addToken(match('=') ? GREATER_EQUAL : GREATER);
                 break;
+
             case '/':
                 if (match('/')) {
                     // A comment goes until the end of the line.
@@ -63,6 +64,18 @@ class Scanner {
                     addToken(SLASH);
                 }
                 break;
+            
+            case ' ':
+            case '\r':
+            case '\t':
+                // Ignore whitespace
+                break;
+
+            case '\n':
+                line++
+                break;
+
+            case '"': string(); break;
 
             default:
                 Lox.error(line, "Unexpected character.");
@@ -70,6 +83,26 @@ class Scanner {
         }
     }
  
+    private void string() {
+        // Builds string lexeme to add token. Throws error if no closing ".
+        while (peek() != '"' && !isAtEnd()) {
+            if (peek() == '\n') line++;
+            advance();
+        }
+
+        if (isAtEnd()) {
+            Lox.error(line, "Unterminated string.");
+            return;
+        }
+
+        // The closing ".
+        advance();
+
+        // Trim the surrounding quotes.
+        String value = source.substring(start + 1, current -1);
+        addToken(STRING, value);
+    }
+
     private boolean match(char expected) {
         // Checks a character and consumes it if there is a match.
         if (isAtEnd()) return false;
