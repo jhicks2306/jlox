@@ -78,13 +78,33 @@ class Scanner {
             case '"': string(); break;
 
             default:
+                if (isDigit(c)) {
+                    number();
+                } else {
                 Lox.error(line, "Unexpected character.");
+                }
                 break;
         }
     }
+
+    private void number() {
+        // Detects number lexeme whilst checking for decimal point.
+        while (isDigit(peek())) advance();
+
+        // Look for fractional part.
+        if (peek() == '.' && isDigit(peekNext())) {
+            // Consume the "."
+            advance();
+
+            while (isDigit(peek())) advance();
+        }
+
+        addToken(NUMBER,
+        Double.parseDouble(source.substring(start, current)));
+    }
  
     private void string() {
-        // Builds string lexeme to add token. Throws error if no closing ".
+        // Detects string lexeme to add token. Throws error if no closing ".
         while (peek() != '"' && !isAtEnd()) {
             if (peek() == '\n') line++;
             advance();
@@ -113,9 +133,20 @@ class Scanner {
     }
 
     private char peek() {
-        // Looks ahead but doesn't consume chacarter.
+        // Looks one ahead but doesn't consume character.
         if (isAtEnd()) return '\0';
         return source.charAt(current);
+    }
+
+    private char peekNext() {
+        // Looks two ahead but doesn't consume character.
+        if (current + 1 >= source.length()) return '\0';
+        return source.charAt(current + 1);
+    }
+
+    private boolean isDigit(char c) {
+        // Checks if character is a digit.
+        return c >= '0' && c <= '9';
     }
 
     private boolean isAtEnd() {
