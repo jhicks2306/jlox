@@ -30,6 +30,7 @@ class Scanner {
     }
 
     private void scanToken() {
+        // Detects different tokens.
         char c = advance();
         switch (c) {
             case '(': addToken(LEFT_PAREN); break;
@@ -60,8 +61,9 @@ class Scanner {
                 break;
         }
     }
-
+ 
     private boolean match(char expected) {
+        // Checks a character and consumes it if there is a match.
         if (isAtEnd()) return false;
         if (source.charAt(current) != expected) return false;
 
@@ -70,20 +72,22 @@ class Scanner {
     }
 
     private boolean isAtEnd() {
+        // Checks if end of source code reached.
         return current >= source.length();
     }
 
     private char advance() {
+        // Moves forward one character and consumes it.
         return source.charAt(current++);
     }
 
-    // overload method for tokens without literals.
     private void addToken(TokenType type) {
+        // Overload method for tokens without literals.
         addToken(type, null);
     }
 
-    // main add token method.
     private void addToken(TokenType type, Object literal) {
+        // Adds token and metadata to list of tokens.
         String text = source.substring(start, current);
         tokens.add(new Token(type, text, literal, line));
     }
