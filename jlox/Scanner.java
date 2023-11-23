@@ -8,6 +8,28 @@ import java.util.Map;
 import static jlox.TokenType.*;
 
 class Scanner {
+    private static final Map<String, TokenType> keywords;
+
+    static {
+        keywords = new HashMap<>();
+        keywords.put("and",    AND);
+        keywords.put("class",  CLASS);
+        keywords.put("else",   ELSE);
+        keywords.put("false",  FALSE);
+        keywords.put("for",    FOR);
+        keywords.put("fun",    FUN);
+        keywords.put("if",     IF);
+        keywords.put("nil",    NIL);
+        keywords.put("or",     OR);
+        keywords.put("print",  PRINT);
+        keywords.put("return", RETURN);
+        keywords.put("super",  SUPER);
+        keywords.put("this",   THIS);
+        keywords.put("true",   TRUE);
+        keywords.put("var",    VAR);
+        keywords.put("while",  WHILE);
+    }
+
     private final String source;
     private final List<Token> tokens = new ArrayList<>();
     private int start = 0;
@@ -78,6 +100,7 @@ class Scanner {
             case '"': string(); break;
 
             default:
+                // Numbers and identifiers.
                 if (isDigit(c)) {
                     number();
                 } else if (isAlpha(c)) {
@@ -90,11 +113,13 @@ class Scanner {
     }
 
     private void identifier() {
-        // Detects identifier lexeme.
+        // Detects identifier lexeme. Looks first to reserved words otherwise identifier.
         while (isAlphaNumeric(peek())) advance();
 
-        addToken(IDENTIFIER);
-    }
+        String text = source.substring(start, current);
+        TokenType type = keywords.get(text);
+        if (type == null) type = IDENTIFIER;
+        }
 
     private void number() {
         // Detects number lexeme whilst checking for decimal point.
@@ -154,12 +179,12 @@ class Scanner {
     }
 
     private boolean isAlpha(char c) {
-        // Checks if character is alpha.
+        // Checks if character is alphabetical character.
         return (c >= 'a' && c <= 'z') ||
                (c >= 'A' && c <= 'Z') ||
                 c == '_';
       }
-
+            
     private boolean isAlphaNumeric(char c) {
         // Checks if character is alphanumeric.
         return isAlpha(c) || isDigit(c);
