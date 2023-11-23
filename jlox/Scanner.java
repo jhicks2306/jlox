@@ -113,7 +113,8 @@ class Scanner {
     }
 
     private void identifier() {
-        // Detects identifier lexeme. Looks first to reserved words otherwise identifier.
+        /* Detects identifier lexeme. Looks first to reserved words, 
+        otherwise user-defined identifier. */
         while (isAlphaNumeric(peek())) advance();
 
         String text = source.substring(start, current);
