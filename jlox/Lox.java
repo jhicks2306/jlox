@@ -7,6 +7,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+import java.lang.StringBuilder;
 
 public class Lox {
     static boolean hadError = false;
@@ -35,12 +36,18 @@ public class Lox {
         BufferedReader reader = new BufferedReader(input);
 
         for (;;) {
-            System.out.print("> ");
-            String line = reader.readLine();
-            if (line == null) break;
-            run(line);
+            System.out.print("> ");   
+            String line;
+            StringBuilder command = new StringBuilder();
+            
+            while ((line = reader.readLine()) != null && !line.isEmpty()) {
+                command.append(line).append('\n');
+                System.out.print(">> ");
+            }
+
+            run(command.toString());
             hadError = false;
-        }
+        }    
     }
 
 
