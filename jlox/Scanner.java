@@ -83,6 +83,7 @@ class Scanner {
                     // A comment goes until the end of the line.
                     while (peek() != '\n' && !isAtEnd()) advance();
                 } else if (match('*')) {
+                    // A multiline comment goes until '*/' is reached.
                     while ((peek() != '*' && peekNext() != '/') && !isAtEnd()) advance();
                     advance(); // consume the *
                     advance(); // consume the /

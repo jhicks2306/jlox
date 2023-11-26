@@ -35,11 +35,12 @@ public class Lox {
         InputStreamReader input = new InputStreamReader(System.in);
         BufferedReader reader = new BufferedReader(input);
 
-        for (;;) {
+        for (;;) { // The REPL loop.
             System.out.print("> ");   
             String line;
             StringBuilder command = new StringBuilder();
             
+            // Allows multiline REPL input.
             while ((line = reader.readLine()) != null && !line.isEmpty()) {
                 command.append(line).append('\n');
                 System.out.print(">> ");
