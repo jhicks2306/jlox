@@ -1,12 +1,12 @@
 package jlox;
 
-import java.time.chrono.MinguoChronology;
 import java.util.List;
 
 import static jlox.TokenType.*;
 
 class Parser {
     /* Consumes flat input sequence of tokens. */
+    private static class ParseError extends RuntimeException {}
     private final List<Token> tokens;
     private int current = 0;
 
@@ -90,6 +90,8 @@ class Parser {
         }
 
         if (match(LEFT_PAREN)) {
+            /* If a ')' is matched then ')' must be matched after parsing
+             the grouped expression. */
             Expr expr = expression();
             consume(RIGHT_PAREN, "Expect ')' after expression.");
             return new Expr.Grouping(expr);
@@ -108,6 +110,13 @@ class Parser {
         }
         
         return false;
+    }
+
+    private Token consume(TokenType type, String message) {
+        // Checks current token and consumes if matches. Otherwise, throws error.
+        if (check(type)) return advance();
+
+        throw error(peek(), message);
     }
 
     private boolean check(TokenType type) {
@@ -134,6 +143,11 @@ class Parser {
     private Token previous() {
         // Returns most recently consumed token.
         return tokens.get(current - 1);
+    }
+
+    private ParseError error(Token token, String message) {
+        Lox.error(token, message);
+        return new ParseError();
     }
 
 
