@@ -27,7 +27,33 @@ class Parser {
     returns it to the caller. */
 
     private Expr expression() {
-        return equality();
+        return comma();
+    }
+
+    private Expr comma() {
+        Expr expr = ternary();
+
+        while(match(COMMA)) {
+            Token operator = previous();
+            Expr right = comparison();
+            expr = new Expr.Binary(expr, operator, right);          
+        }
+
+        return expr;
+    }
+
+    private Expr ternary() {
+        Expr expr = equality();
+
+        if (match(Q_MARK)) {
+            Token operator = previous();
+            Expr left = ternary();
+            consume(COLON, "Expect ':' after expression for ternary.");
+            Expr right = ternary();
+            expr = new Expr.Ternary(expr, operator, left, right);
+        }
+
+        return expr;
     }
 
     private Expr equality() {

@@ -7,7 +7,12 @@ class AstPrinter implements Expr.Visitor<String> {
         return expr.accept(this);
     }
 
-    // Methods to represent each type of expression as a string.
+    @Override
+    public String visitTernaryExpr(Expr.Ternary expr) {
+        return parenthesize("ternary", expr.condition,
+                             expr.left, expr.right);
+    }
+
     @Override
     public String visitBinaryExpr(Expr.Binary expr) {
         return parenthesize(expr.operator.lexeme,
