@@ -130,8 +130,11 @@ class Parser {
             consume(RIGHT_PAREN, "Expect ')' after expression.");
             return new Expr.Grouping(expr);
         }
-
-        throw error(peek(), "Expect expression.");
+        if (match(COMMA, Q_MARK,BANG_EQUAL, EQUAL_EQUAL, GREATER, GREATER_EQUAL, LESS, LESS_EQUAL, MINUS, PLUS, SLASH, STAR)) {
+            throw error(previous(), "Operator must have left operand.");
+        } else {
+            throw error(peek(), "Expect expression.");
+        }
     }
 
     private boolean match(TokenType... types) {
