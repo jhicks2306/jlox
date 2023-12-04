@@ -24,13 +24,22 @@ class Parser {
 
     /*  Methods for each rule of Lox's grammar. Each method for 
     parsing a grammar rule produces a syntax tree for that rule and 
-    returns it to the caller. */
+    returns it to the caller.
+    
+    The grammar comments use the following syntax:
+    '|' separates productions
+    '*' means production can appear zero or more times.
+    '+' means production can appear one or more times.
+    '?' means production can appear zero or one time.
+    '()'group productions */
 
     private Expr expression() {
+        // expression     → equality ;
         return equality();
     }
 
     private Expr equality() {
+        // equality       → comparison ( ( "!=" | "==" ) comparison )* ;
         Expr expr = comparison();
 
         while (match(BANG_EQUAL, EQUAL_EQUAL)) {
@@ -43,6 +52,7 @@ class Parser {
     }
 
     private Expr comparison() {
+        // comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
         Expr expr = term();
 
         while (match(GREATER, GREATER_EQUAL, LESS, LESS_EQUAL)) {
@@ -55,6 +65,7 @@ class Parser {
     }
 
     private Expr term() {
+        // term           → factor ( ( "-" | "+" ) factor )* ;
         Expr expr = factor();
 
         while (match(MINUS, PLUS)) {
@@ -67,6 +78,7 @@ class Parser {
     }
 
     private Expr factor() {
+        // factor         → unary ( ( "/" | "*" ) unary )* ;
         Expr expr = unary();
 
         while (match(SLASH, STAR)) {
@@ -79,6 +91,7 @@ class Parser {
     }
 
     private Expr unary() {
+        // unary          → ( "!" | "-" ) unary | primary ;
         if (match(BANG, MINUS)) {
             Token operator = previous();
             Expr right = unary();
@@ -89,6 +102,7 @@ class Parser {
     }
 
     private Expr primary() {
+        // primary        → NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" ;
         if (match(FALSE)) return new Expr.Literal(false);
         if (match(TRUE)) return new Expr.Literal(true);
         if (match(NIL)) return new Expr.Literal(null); 
