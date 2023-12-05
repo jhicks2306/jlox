@@ -156,6 +156,7 @@ class Parser {
     }
 
     private boolean isAtEnd() {
+        // Check if have reached end of file.
         return peek().type == EOF;
     }
 
@@ -170,6 +171,7 @@ class Parser {
     }
 
     private ParseError error(Token token, String message) {
+        // Defines a parse error and passes to general Lox error.
         Lox.error(token, message);
         return new ParseError();
     }
