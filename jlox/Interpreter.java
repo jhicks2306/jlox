@@ -1,12 +1,18 @@
 package jlox;
 
-class Interpreter implements Expr.Visitor<Object> {
+import java.util.List;
 
-    void interpret(Expr expression) {
-        // Takes in a syntax tree for an expression and evaluates it.
+import javax.sound.midi.VoiceStatus;
+
+class Interpreter implements Expr.Visitor<Object>,
+                             Stmt.Visitor<Void> {
+
+    void interpret(List<Stmt> statements) {
+        // Takes in a program (list of statements) and interprets it.
         try {
-            Object value = evaluate(expression);
-            System.out.println(stringify(value));
+            for (Stmt statement : statements) {
+                execute(statement);
+            }
         } catch (RuntimeError error) {
             Lox.runtimeError(error);
         }
@@ -14,20 +20,42 @@ class Interpreter implements Expr.Visitor<Object> {
 
     @Override
     public Object visitLiteralExpr(Expr.Literal expr) {
+        // Interprets a Literal expression.
         return expr.value;
     }
 
     @Override
     public Object visitGroupingExpr(Expr.Grouping expr) {
+        // Interprets a grouping expression.
         return evaluate(expr.expression);
     }
 
     private Object evaluate(Expr expr) {
+        // Evaluates an expression by passing the encapsulating Visitor to accept method.
         return expr.accept(this);
+    }
+
+    private void execute(Stmt stmt) {
+        // Executes a statement by passing the encapsulating Visitor to accept method.
+        stmt.accept(this);
+    }
+
+    @Override
+    public Void visitExpressionStmt(Stmt.Expression stmt) {
+        evaluate(stmt.expression);
+        return null;
+    }
+
+    @Override
+    public Void visitPrintStmt(Stmt.Print stmt) {
+        Object value = evaluate(stmt.expression);
+        System.out.println(stringify(value));
+        return null;
     }
 
     @Override
     public Object visitUnaryExpr(Expr.Unary expr) {
+        // Interprets and Unary expression.
         Object right = evaluate(expr.right);
 
         // Cast the right operand to a double at runtime (dynamic typing)
@@ -44,23 +72,27 @@ class Interpreter implements Expr.Visitor<Object> {
     }
 
     private void checkNumberOperand(Token operator, Object operand) {
+        // Checks if operand for Unary operator is a number.
         if (operand instanceof Double) return;
         throw new RuntimeError(operator, "Operand must be a number.");
     }
 
     private void checkNumberOperands(Token operator, Object left, Object right) {
+        // Checks if operands for Binary operators are numbers. 
         if (left instanceof Double && right instanceof Double) return;
 
         throw new RuntimeError(operator, "Operands must be numbers.");
     }
 
     private boolean isTruthy(Object object) {
+        // Checks truthiness of an Object.
         if (object == null) return false;
         if (object instanceof Boolean) return (boolean)object;
         return true;
     }
 
     private boolean isEqual(Object a, Object b) {
+        // Checks if two Objects are equal.
         if (a == null && b == null) return true;
         if (a == null) return false;
 
@@ -68,6 +100,7 @@ class Interpreter implements Expr.Visitor<Object> {
     }
 
     private String stringify(Object object) {
+        // Turns a Double into a String.
         if (object == null) return "nil";
 
         if (object instanceof Double) {
@@ -82,9 +115,12 @@ class Interpreter implements Expr.Visitor<Object> {
 
     @Override
     public Object visitBinaryExpr(Expr.Binary expr) {
+        // Interprets a Binary expression.
+
         Object left = evaluate(expr.left);
         Object right = evaluate(expr.right);
 
+        // Choose behaviour based on operator type.
         switch (expr.operator.type) {
             case BANG_EQUAL: return !isEqual(left,right);
             case EQUAL_EQUAL: return isEqual(left,right);
