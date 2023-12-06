@@ -104,6 +104,12 @@ class Interpreter implements Expr.Visitor<Object> {
                 checkNumberOperands(expr.operator, left, right);
                 return (double)left - (double)right;
             case PLUS:
+                if ((
+                    left instanceof Double && right instanceof String) ||
+                    (left instanceof String && right instanceof Double)
+                    )
+                        return stringify(left) + stringify(right);
+
                 if (left instanceof Double && right instanceof Double) {
                     return (double)left + (double)right;
                 }
@@ -112,9 +118,12 @@ class Interpreter implements Expr.Visitor<Object> {
                     return (String)left + (String)right;
                 }
 
-                throw new RuntimeError(expr.operator, "Operands must be two numbers or two strings.");
+                throw new RuntimeError(expr.operator, "Operands not compatible.");
             case SLASH:
                 checkNumberOperands(expr.operator, left, right);
+                if ((double)right == 0) {
+                    throw new RuntimeError(expr.operator, "Cannot divide by zero.");
+                }
                 return (double)left / (double)right;
             case STAR:
                 checkNumberOperands(expr.operator, left, right);
