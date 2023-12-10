@@ -47,7 +47,7 @@ class Parser {
         try {
             if (match(VAR)) return varDeclaration();
 
-            return statement()
+            return statement();
         } catch (ParseError error) {
             synchronize();
             return null;

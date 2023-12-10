@@ -6,6 +6,8 @@ import javax.sound.midi.VoiceStatus;
 
 class Interpreter implements Expr.Visitor<Object>,
                              Stmt.Visitor<Void> {
+    
+    private Environment environment = new Environment();
 
     void interpret(List<Stmt> statements) {
         // Takes in a program (list of statements) and interprets it.
@@ -48,8 +50,21 @@ class Interpreter implements Expr.Visitor<Object>,
 
     @Override
     public Void visitPrintStmt(Stmt.Print stmt) {
+        // Interprets a print statment.
         Object value = evaluate(stmt.expression);
         System.out.println(stringify(value));
+        return null;
+    }
+
+    @Override
+    public Void visitVarStmt(Stmt.Var stmt) {
+        // Interprets a variable declaration statment.
+        Object value = null;
+        if (stmt.initializer != null) {
+            value = evaluate(stmt.initializer);
+        }
+
+        environment.define(stmt.name.lexeme, value);
         return null;
     }
 
@@ -69,6 +84,12 @@ class Interpreter implements Expr.Visitor<Object>,
 
         // Unreachable.
         return null;
+    }
+
+    @Override
+    public Object visitVariableExpr(Expr.Variable expr) {
+        // Interprets variable expression.
+        return environment.get(expr.name);
     }
 
     private void checkNumberOperand(Token operator, Object operand) {
