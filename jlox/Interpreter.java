@@ -91,10 +91,12 @@ class Interpreter implements Expr.Visitor<Object>,
 
     @Override
     public Void visitVarStmt(Stmt.Var stmt) {
-        // Interprets a variable declaration statment.
+        // Interprets a variable declaration statement.
         Object value = null;
         if (stmt.initializer != null) {
             value = evaluate(stmt.initializer);
+        } else {
+            throw new RuntimeError(stmt.name, "Variable:'" + stmt.name.lexeme + "' has not been assigned.");
         }
 
         environment.define(stmt.name.lexeme, value);
