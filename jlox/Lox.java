@@ -51,12 +51,24 @@ public class Lox {
         Scanner scanner = new Scanner(source);
         List<Token> tokens = scanner.scanTokens();
         Parser parser = new Parser(tokens);
-        List<Stmt> statements = parser.parse();
+        String last_lexeme = tokens.get(tokens.size() - 2).lexeme;
+        boolean expr_check = (last_lexeme.equals("}") ||
+                              last_lexeme.equals(";"));
+        if (expr_check) {
+            List<Stmt> statements = parser.parseStmts();
 
-        // Stop if there was a syntax error.
-        if (hadError) return;
+            // Stop if there was a syntax error.
+            if (hadError) return;
 
-        interpreter.interpret(statements);
+            interpreter.interpretStmts(statements);
+        } else {
+            Expr expression = parser.parseExpr();
+
+            // Stop if there was a syntax error.
+            if (hadError) return;
+
+            interpreter.interpretExpr(expression);    
+        }
     }
     
     // Basic error handling

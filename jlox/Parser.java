@@ -15,7 +15,15 @@ class Parser {
         this.tokens = tokens;
     }
 
-    List<Stmt> parse() {
+    Expr parseExpr () {
+        try {
+            return expression();
+          } catch (ParseError error) {
+            return null;
+          }
+    }
+
+    List<Stmt> parseStmts() {
         List<Stmt> statements = new ArrayList<>();
         while (!isAtEnd()) {
             statements.add(declaration());
@@ -46,6 +54,7 @@ class Parser {
          */
         try {
             if (match(VAR)) return varDeclaration();
+
 
             return statement();
         } catch (ParseError error) {
@@ -83,7 +92,8 @@ class Parser {
     private Stmt expressionStatement() {
         // Parses an expression statement.
         Expr expr = expression();
-        consume(SEMICOLON, "Expect ';' after expression.");
+
+        consume(SEMICOLON, "Expect ';' expression.");
         return new Stmt.Expression(expr);
     }
 
