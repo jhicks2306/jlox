@@ -42,6 +42,30 @@ class Interpreter implements Expr.Visitor<Object>,
         stmt.accept(this);
     }
 
+    void executeBlock(List<Stmt> statements,
+                      Environment environment) {
+        // Store the outer environment.
+        Environment previous = this.environment;
+
+        try {
+            // Update interpreter's environment to new local one and execute statements.
+            this.environment = environment;
+
+            for (Stmt statement : statements) {
+                execute(statement);
+            }
+        } finally {
+            // Restore interpreter's environment to outer one.
+            this.environment = previous;
+        }
+                      }
+
+    @Override
+    public Void visitBlockStmt(Stmt.Block stmt) {
+        executeBlock(stmt.statements, new Environment(environment));
+        return null;
+    }
+
     @Override
     public Void visitExpressionStmt(Stmt.Expression stmt) {
         evaluate(stmt.expression);
@@ -66,6 +90,13 @@ class Interpreter implements Expr.Visitor<Object>,
 
         environment.define(stmt.name.lexeme, value);
         return null;
+    }
+
+    @Override
+    public Object visitAssignExpr(Expr.Assign expr) {
+        Object value = evaluate(expr.value);
+        environment.assign(expr.name, value);
+        return value;
     }
 
     @Override
