@@ -62,13 +62,26 @@ class Interpreter implements Expr.Visitor<Object>,
 
     @Override
     public Void visitBlockStmt(Stmt.Block stmt) {
+        // Interprets a block statement (in new environment).
         executeBlock(stmt.statements, new Environment(environment));
         return null;
     }
 
     @Override
     public Void visitExpressionStmt(Stmt.Expression stmt) {
+        // Interprets an expression statement.
         evaluate(stmt.expression);
+        return null;
+    }
+
+    @Override
+    public Void visitIfStmt(Stmt.If stmt) {
+        // Interprets an if statement.
+        if (isTruthy(evaluate(stmt.condition))) {
+            execute(stmt.thenBranch);
+        } else if (stmt.elseBranch != null) {
+            execute(stmt.elseBranch);
+        }
         return null;
     }
 
