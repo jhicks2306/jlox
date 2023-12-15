@@ -261,7 +261,16 @@ class Interpreter implements Expr.Visitor<Object>,
             arguments.add(evaluate(argument));
         }
 
-        LoxCallabe function = (LoxCallable)callee;
+        if (!(callee instanceof LoxCallable)) {
+            throw new RuntimeError(expr.paren, "Can only call functions and classes.");
+        }
+
+        LoxCallable function = (LoxCallable)callee;
+        if (arguments.size() != function.arity()) {
+            throw new RuntimeError(expr.paren, "Expected " + 
+                function.arity() + " arguments but got " +
+                arguments.size() + ".");
+        }
         return function.call(this, arguments);
     }
 
