@@ -7,8 +7,21 @@ import javax.sound.midi.VoiceStatus;
 
 class Interpreter implements Expr.Visitor<Object>,
                              Stmt.Visitor<Void> {
-    
-    private Environment environment = new Environment();
+    final Environment globals = new Environment();
+    private Environment environment = globals;
+
+    Interpreter() {
+        globals.define("clock", new LoxCallable() {
+            @Override
+            public int arity() { return 0; }
+
+            @Override
+            public Object call(Interpreter interpreter,
+                                List<Object> argumen) {
+                return (double)System.currentTimeMillis() / 1000.0;
+            }
+        });
+    }
 
     void interpret(List<Stmt> statements) {
         // Takes in a program (list of statements) and interprets it.
