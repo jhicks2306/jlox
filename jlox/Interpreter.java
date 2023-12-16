@@ -102,6 +102,13 @@ class Interpreter implements Expr.Visitor<Object>,
     }
 
     @Override
+    public Void visitFunctionStmt(Stmt.Function stmt) {
+        LoxFunction function = new LoxFunction(stmt);
+        environment.define(stmt.name.lexeme, function);
+        return null;
+    }
+
+    @Override
     public Void visitIfStmt(Stmt.If stmt) {
         // Interprets an if statement.
         if (isTruthy(evaluate(stmt.condition))) {
