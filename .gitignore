@@ -4,3 +4,4 @@ tool/tool/
 .vscode/
 jlox/line_script
 jlox/test_REPL
+test_lines
