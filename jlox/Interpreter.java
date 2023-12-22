@@ -100,6 +100,16 @@ class Interpreter implements Expr.Visitor<Object>,
     }
 
     @Override
+    public Void visitClassStmt(Stmt.Class stmt) {
+        /* Declares class name in current environment, turn the class syntax node
+         into LoxClass (runtime representation of a class), and store against the named vairable. */
+        environment.define(stmt.name.lexeme, null);
+        LoxClass klass = new LoxClass(stmt.name.lexeme);
+        environment.assign(stmt.name, klass);
+        return null;
+    }
+
+    @Override
     public Void visitExpressionStmt(Stmt.Expression stmt) {
         // Interprets an expression statement.
         evaluate(stmt.expression);
