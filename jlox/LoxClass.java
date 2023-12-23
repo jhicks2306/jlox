@@ -31,11 +31,18 @@ class LoxClass implements LoxCallable {
     public Object call(Interpreter interpreter,
                         List<Object> arguments) {
         LoxInstance instance = new LoxInstance(this);
+        LoxFunction initializer = findMethod("init");
+        if (initializer != null) { // When a class is called look for init method.
+            initializer.bind(instance).call(interpreter, arguments);
+        }
         return instance;
     }
 
     @Override
     public int arity() {
-    return 0;
+        // Class arity matches the arity of the initializer, if there is one.
+        LoxFunction initializer = findMethod("init");
+        if (initializer == null) return 0;
+        return initializer.arity();
     }
 }
