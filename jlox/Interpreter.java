@@ -64,6 +64,7 @@ class Interpreter implements Expr.Visitor<Object>,
 
         Object value = evaluate(expr.value);
         ((LoxInstance)object).set(expr.name, value);
+        return value;
     }
 
     @Override
@@ -116,7 +117,14 @@ class Interpreter implements Expr.Visitor<Object>,
         /* Declares class name in current environment, turn the class syntax node
          into LoxClass (runtime representation of a class), and store against the named vairable. */
         environment.define(stmt.name.lexeme, null);
-        LoxClass klass = new LoxClass(stmt.name.lexeme);
+
+        Map<String, LoxFunction> methods = new HashMap<>();
+        for (Stmt.Function method : stmt.methods) {
+            LoxFunction function = new LoxFunction(method, environment);
+            methods.put(method.name.lexeme, function);
+        }
+
+        LoxClass klass = new LoxClass(stmt.name.lexeme, methods);
         environment.assign(stmt.name, klass);
         return null;
     }
