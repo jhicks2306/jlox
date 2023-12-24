@@ -121,7 +121,14 @@ class Interpreter implements Expr.Visitor<Object>,
     public Void visitClassStmt(Stmt.Class stmt) {
         /* Declares class name in current environment, turn the class syntax node
          into LoxClass (runtime representation of a class), and store against the named vairable. */
-        environment.define(stmt.name.lexeme, null);
+        Object superclass = null;
+        if (stmt.superclass != null) {
+            superclass = evaluate(stmt.superclass);
+            if(!(superclass instanceof LoxClass)) {
+                throw new RuntimeError(stmt.superclass.name, "Superclass must be a class.");
+            }
+        }
+         environment.define(stmt.name.lexeme, null);
 
         Map<String, LoxFunction> methods = new HashMap<>();
         for (Stmt.Function method : stmt.methods) {
@@ -130,7 +137,7 @@ class Interpreter implements Expr.Visitor<Object>,
             methods.put(method.name.lexeme, function);
         }
 
-        LoxClass klass = new LoxClass(stmt.name.lexeme, methods);
+        LoxClass klass = new LoxClass(stmt.name.lexeme, (LoxClass)superclass, methods);
         environment.assign(stmt.name, klass);
         return null;
     }
